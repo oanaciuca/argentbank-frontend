@@ -1,56 +1,27 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { loginUser } from '../redux/authSlice'; 
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginUser } from '../redux/authSlice';
 import { useNavigate } from 'react-router-dom';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  
+  const { isAuthenticated, loading, error, token } = useSelector((state) => state.auth);
 
-    const loginPayload = {
-      email,
-      password,
-    };
 
-    try {
-      const response = await fetch('http://localhost:3001/api/v1/user/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(loginPayload),
-      });
-
-      if (!response.ok) {
-        throw new Error('Invalid credentials');
-      }
-
-      const data = await response.json();
-
-      // Vérification de la présence du token
-      const token = data.body.token;
-      if (!token) {
-        throw new Error('Token is missing');
-      }
-
-      // Sauvegarder le token dans localStorage
-      localStorage.setItem('token', token);
-
-      // Vous pouvez également ajouter d'autres données utilisateur si nécessaires
-      dispatch(loginUser({ token }));
-
-      // Redirection vers le profil utilisateur
+  useEffect(() => {
+    if (isAuthenticated && token) {
       navigate('/user');
-    } catch (error) {
-      setError(error.message);
-      console.error("Error during login:", error);
     }
+  }, [isAuthenticated, token, navigate]);
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    dispatch(loginUser({ email, password }));
   };
 
   return (
@@ -83,8 +54,12 @@ const SignIn = () => {
             <input type="checkbox" id="remember-me" />
             <label htmlFor="remember-me">Remember me</label>
           </div>
+
           {error && <p className="error-message">{error}</p>}
-          <button className="sign-in-button">Sign In</button>
+
+          <button className="sign-in-button" type="submit" disabled={loading}>
+            {loading ? 'Connexion...' : 'Sign In'}
+          </button>
         </form>
       </section>
       <footer className="footer">
