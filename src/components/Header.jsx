@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { logoutUser, fetchUserData } from '../redux/authSlice';
+import { logout } from '../redux/authSlice';
 import argentBankLogo from '../assets/img/argentBankLogo.png';
 
 
@@ -10,24 +10,14 @@ const Header = () => {
   const navigate = useNavigate();
   const { isAuthenticated, userData } = useSelector((state) => state.auth);
 
-  const token = localStorage.getItem('token');
-
-  useEffect(() => {
-    if (isAuthenticated && token) {
-      dispatch(fetchUserData(token));  
-    }
-  }, [isAuthenticated, token, dispatch]);
-
   useEffect(() => {
     if (!isAuthenticated) {
-      navigate('/'); 
+      navigate('/');
     }
   }, [isAuthenticated, navigate]);
 
   const handleLogout = () => {
-    console.log('Déconnexion en cours...');
-    localStorage.removeItem('token');
-    dispatch(logoutUser());
+    dispatch(logout());
     navigate('/');
   };
 

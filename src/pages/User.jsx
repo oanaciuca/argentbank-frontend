@@ -1,33 +1,23 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
-import { fetchUserProfile } from '../api/userApi';
+import { fetchUserData } from '../redux/authSlice';
 
 const User = () => {
-  const [userData, setUserData] = useState(null); 
-  const [accounts, setAccounts] = useState([]);  
-  const [loading, setLoading] = useState(true); 
-  const [error, setError] = useState(null);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { userData, accounts, loading, error } = useSelector((state) => state.auth);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    
     if (token) {
-      fetchUserProfile(token)
-        .then(data => {
-          setUserData(data.body); 
-          setAccounts(data.body.accounts || []); 
-          setLoading(false);
-        })
-        .catch(err => {
-          setError('Failed to fetch user profile');
-          setLoading(false);
-        });
+      dispatch(fetchUserData(token)); // Dispatch pour récupérer les données utilisateur
     } else {
-      setError('No token found');
-      setLoading(false);
+      navigate('/login'); // Redirige vers /login si le token est absent
     }
-  }, []);
+  }, [dispatch, navigate]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -62,17 +52,22 @@ const User = () => {
       </nav>
       <main className="main bg-dark">
         <div className="header">
-          <h1>Welcome back<br />{userData?.firstName} {userData?.lastName}!</h1>
+          <h1>
+            Welcome back<br />
+            {userData?.firstName} {userData?.lastName}!
+          </h1>
           <button className="edit-button">Edit Name</button>
         </div>
 
         <h2 className="sr-only">Accounts</h2>
 
-        {accounts.length > 0 ? (
+        {accounts && accounts.length > 0 ? (
           accounts.map((account, index) => (
             <section className="account" key={index}>
               <div className="account-content-wrapper">
-                <h3 className="account-title">{account.name} ({account.id})</h3>
+                <h3 className="account-title">
+                  {account.name} ({account.id})
+                </h3>
                 <p className="account-amount">${account.balance}</p>
                 <p className="account-amount-description">{account.description}</p>
               </div>
@@ -82,9 +77,8 @@ const User = () => {
             </section>
           ))
         ) : (
-          <p>No accounts found.</p> 
+          <p>No accounts found.</p>
         )}
-        
       </main>
       <Footer />
     </div>
