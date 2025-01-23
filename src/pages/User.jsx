@@ -27,7 +27,7 @@ const User = () => {
   };
 
   const handleSave = (newUserData) => {
-    dispatch(updateUser({ newUserName: newUserData, token })); // Dispatcher l'action de mise à jour
+    dispatch(updateUser({ newUserName: newUserData, token })); 
     setIsEditing(false);
   };
 
@@ -46,7 +46,7 @@ const User = () => {
             userData={userData}
             onSave={handleSave}
             onCancel={handleCancel}
-            loading={false} // Si un état de chargement est nécessaire
+            loading={false} 
           />
         ) : (
           <>
