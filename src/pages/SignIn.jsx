@@ -2,32 +2,49 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from '../redux/authSlice';
 import { useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false); // État pour "Remember me"
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   
-  const { isAuthenticated, loading, error, token } = useSelector((state) => state.auth);
+  const { isAuthenticated, loading, error } = useSelector((state) => state.auth);
 
 
   useEffect(() => {
-    if (isAuthenticated && token) {
+    if (isAuthenticated) {
       navigate('/user');
     }
-  }, [isAuthenticated, token, navigate]);
+  }, [isAuthenticated, navigate]);
+
+  // Charger les données si "Remember me" est actif
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('rememberedEmail');
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberMe(true);
+    }
+  }, []);
 
   const handleLogin = (e) => {
     e.preventDefault();
+    if (rememberMe) {
+      localStorage.setItem('rememberedEmail', email);
+    } else {
+      localStorage.removeItem('rememberedEmail');
+    }
     dispatch(loginUser({ email, password }));
   };
 
   return (
     <main className="main bg-dark">
       <section className="sign-in-content">
-        <i className="fa fa-user-circle sign-in-icon"></i>
+      <FontAwesomeIcon icon={faUserCircle} className="sign-in-icon" />
         <h1>Sign In</h1>
         <form onSubmit={handleLogin}>
           <div className="input-wrapper">
@@ -51,7 +68,8 @@ const SignIn = () => {
             />
           </div>
           <div className="input-remember">
-            <input type="checkbox" id="remember-me" />
+            <input type="checkbox" id="remember-me" checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}/>
             <label htmlFor="remember-me">Remember me</label>
           </div>
 
@@ -62,9 +80,6 @@ const SignIn = () => {
           </button>
         </form>
       </section>
-      <footer className="footer">
-        <p className="footer-text">Copyright 2020 Argent Bank</p>
-      </footer>
     </main>
   );
 };
