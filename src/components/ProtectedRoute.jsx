@@ -7,7 +7,7 @@ const ProtectedRoute = ({ children }) => {
 
   useEffect(() => {
     console.log("Vérification de l'authentification dans ProtectedRoute:", isAuthenticated);
-  }, [isAuthenticated]); // Cette dépendance surveille isAuthenticated
+  }, [isAuthenticated]); 
 
   if (!isAuthenticated) {
     return <Navigate to="/signin" />;
