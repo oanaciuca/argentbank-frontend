@@ -57,7 +57,7 @@ const EditUserForm = ({ onSave, onCancel, loading }) => {
           <input
             type="text"
             id="firstName"
-            value={newUserData.firstName}
+            value={userData.firstName}
             readOnly 
           />
         </div>
@@ -66,7 +66,7 @@ const EditUserForm = ({ onSave, onCancel, loading }) => {
           <input
             type="text"
             id="lastName"
-            value={newUserData.lastName}
+            value={userData.lastName}
             readOnly 
           />
         </div>
