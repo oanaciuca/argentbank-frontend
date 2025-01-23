@@ -1,30 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateUser } from '../redux/authSlice'; // Importer la fonction updateUser du userSlice
+import { updateUser } from '../redux/authSlice'; 
 
 const EditUserForm = ({ onSave, onCancel, loading }) => {
-  // Récupérer l'utilisateur connecté depuis le store Redux
   const userData = useSelector((state) => state.auth.userData);
   const dispatch = useDispatch();
 
-  // Si userData est indéfini ou vide, on peut retourner un état de chargement.
   if (loading) {
     return <div>Loading...</div>;
   }
 
-  // Si userData est encore indéfini ou vide, on peut afficher un message d'erreur ou ne rien afficher
   if (!userData) {
     return <div>No user data available</div>;
   }
 
-  // Utilisation de useState avec userData pour initialiser les valeurs par défaut
   const [newUserData, setNewUserData] = useState({
     userName: userData.userName || '',
     firstName: userData.firstName || '',
     lastName: userData.lastName || '',
   });
 
-  // Ajouter le useEffect pour mettre à jour les données lorsque userData change
   useEffect(() => {
     if (userData) { 
     setNewUserData({
@@ -33,23 +28,12 @@ const EditUserForm = ({ onSave, onCancel, loading }) => {
       lastName: userData.lastName || '',
     });
   }
-  }, [userData]); // Ce hook sera exécuté chaque fois que userData change
+  }, [userData]); 
 
-  // Mise à jour des champs lorsque l'utilisateur modifie les valeurs
-  const handleChange = (e) => {
-    const { id, value } = e.target;
-    console.log(`Changement de ${id}: ${value}`); // Ajoutez un log pour voir la valeur
-    setNewUserData((prevData) => ({
-      ...prevData,
-      [id]: value,
-    }));
-  };
-
-  // Sauvegarde des modifications
+  
   const handleSaveClick = () => {
-    console.log('Données sauvegardées:', newUserData);
-    dispatch(updateUser({ newUserName: newUserData.userName })); // Mettre à jour les informations utilisateur dans le store
-    onSave(newUserData); // Appeler onSave avec les nouvelles données
+    dispatch(updateUser({ newUserName: newUserData.userName })); 
+    onSave(newUserData); 
   };
 
 
@@ -63,7 +47,7 @@ const EditUserForm = ({ onSave, onCancel, loading }) => {
             type="text"
             id="username"
             value={newUserData.userName}
-            onChange={(e) => setNewUserData({ ...newUserData, userName: e.target.value })} // Mettre à jour uniquement userName ici
+            onChange={(e) => setNewUserData({ ...newUserData, userName: e.target.value })} 
             placeholder="Enter a new username"
           />
           <p>Valeur du username : {newUserData.userName}</p>
@@ -74,7 +58,7 @@ const EditUserForm = ({ onSave, onCancel, loading }) => {
             type="text"
             id="firstName"
             value={newUserData.firstName}
-            readOnly // Le champ est en lecture seule
+            readOnly 
           />
         </div>
         <div className="form-group">
@@ -83,7 +67,7 @@ const EditUserForm = ({ onSave, onCancel, loading }) => {
             type="text"
             id="lastName"
             value={newUserData.lastName}
-            readOnly // Le champ est en lecture seule
+            readOnly 
           />
         </div>
         <div className="button-group">
