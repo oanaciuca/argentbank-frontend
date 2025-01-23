@@ -8,7 +8,7 @@ import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false); // État pour "Remember me"
+  const [rememberMe, setRememberMe] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -22,7 +22,7 @@ const SignIn = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  // Charger les données si "Remember me" est actif
+  
   useEffect(() => {
     const savedEmail = localStorage.getItem('rememberedEmail');
     if (savedEmail) {
