@@ -27,16 +27,13 @@ const User = () => {
   };
 
   const handleSave = (newUserData) => {
-    dispatch(updateUser({ newUserName: newUserData, token })); 
+    dispatch(updateUser({ newUserName: newUserData.userName, token })); 
     setIsEditing(false);
   };
 
   if (!isAuthenticated || !userData) {
     return <div>Loading...</div>;
   }
-
-  
-  
 
   return (
     <main className="main bg-dark">
