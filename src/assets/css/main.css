@@ -289,3 +289,92 @@ body {
     width: 200px;
   }
 }
+
+
+
+
+/* Conteneur principal du formulaire */
+.edit-container {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+/* Style du formulaire */
+.edit-user-form {
+  background-color: white;
+  width: 300px;
+  margin: 0 auto;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+/* Groupes de champs */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  margin-bottom: 1rem;
+}
+
+/* Labels */
+.form-group label {
+  font-weight: bold;
+}
+
+/* Champs de saisie */
+.form-group input {
+  padding: 5px;
+  font-size: 1.2rem;
+  border: 1px solid #ccc;
+}
+
+/* Champs désactivés */
+.form-group input:disabled {
+  background-color: #e9ecef;
+  cursor: not-allowed;
+}
+
+/* Boutons */
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.edit-form-button {
+  padding: 8px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+/* Bouton "Save" */
+.edit-form-button:first-child {
+  border-color: #00bc77;
+  background-color: #00bc77;
+  color: white;
+}
+
+.edit-form-button:first-child:hover {
+  background-color: #009f60;
+}
+
+/* Bouton "Cancel" */
+.edit-form-button:last-child {
+  background-color: #ccc;
+  color: black;
+}
+
+.edit-form-button:last-child:hover {
+  background-color: #b3b3b3;
+}
+
+/* Désactiver le bouton Save lorsqu'il est en loading */
+.edit-form-button:disabled {
+  background-color: #8f8f8f;
+  cursor: not-allowed;
+}
+
