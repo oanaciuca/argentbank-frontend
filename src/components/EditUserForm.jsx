@@ -52,7 +52,7 @@ const EditUserForm = ({ userData, onSave, onCancel, loading }) => {
             type="text"
             id="firstName"
             value={newUserData.firstName}
-            readOnly 
+            disabled
           />
         </div>
         <div className="form-group">
@@ -61,7 +61,7 @@ const EditUserForm = ({ userData, onSave, onCancel, loading }) => {
             type="text"
             id="lastName"
             value={newUserData.lastName}
-            readOnly 
+            disabled 
           />
         </div>
         <div className="button-group">
