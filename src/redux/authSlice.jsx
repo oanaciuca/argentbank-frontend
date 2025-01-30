@@ -1,40 +1,56 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { login } from '../api/authApi.jsx';
-import usersData from '../data/usersData'; 
-import { updateUserProfile } from '../api/userApi'; 
-
+import { login } from '../api/authApi';  
+import { updateUserProfile } from '../api/userApi';  
 
 const initialState = {
   isAuthenticated: false,
-  userData: null,
-  email: null,
+  userData: {
+    id: '',
+    email: '',
+    firstName: '',
+    lastName: '',
+    userName: '',
+  },
   token: null,
   loading: false,
   error: null,
 };
 
-export const loginUser = createAsyncThunk('auth/login', async ({ email, password }) => {
-  const response = await login(email, password); 
-  const userData = usersData.find((user) => user.email === email); 
-  if (!userData) {
-    throw new Error('Utilisateur non trouvé'); 
+export const loginUser = createAsyncThunk(
+  'auth/login',
+  async ({ email, password }, { rejectWithValue }) => {
+    try {
+      const response = await login(email, password); 
+      console.log("Login response:", JSON.stringify(response, null, 2)); 
+
+      return response;  
+    } catch (error) {
+      console.error("Erreur dans loginUser:", error); 
+      return rejectWithValue(error.message);  
+    }
   }
+);
 
-  const token = response.token;
+export const updateUser = createAsyncThunk(
+  'auth/updateUser',
+  async ({ newUserName }, { rejectWithValue }) => {
+    const token = localStorage.getItem('token');  
+    console.log("Token dans updateUser : ", token);  
+    if (!token) {
+      return rejectWithValue('Token absent');
+    }
 
-  localStorage.setItem('token', token);
+    try {
+      await updateUserProfile(newUserName);
+      console.log("Réponse de updateUserProfile: Mise à jour réussie");
 
-  return { ...userData, token }; 
-});
-
-export const updateUser = createAsyncThunk('auth/updateUser', async ({ newUserName, token }) => {
-  const response = await updateUserProfile(newUserName, token);
-  if (!response) {
-    throw new Error('Impossible de mettre à jour le nom d\'utilisateur');
+      return { userName: newUserName };
+    } catch (error) {
+      console.error("Erreur dans updateUser thunk:", error);
+      return rejectWithValue(error.message);  
+    } 
   }
-
-  return response; 
-});
+);
 
 const authSlice = createSlice({
   name: 'auth',
@@ -43,9 +59,15 @@ const authSlice = createSlice({
     logout: (state) => {
       state.isAuthenticated = false;
       state.token = null;
-      state.userData = null;
+      state.userData = {
+        id: '',
+        email: '',
+        firstName: '',
+        lastName: '',
+        userName: '',
+      };
       state.email = null;
-      localStorage.removeItem('token');
+      localStorage.removeItem('token');  
     },
   },
   extraReducers: (builder) => {
@@ -55,28 +77,43 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
-        console.log('Connexion réussie :', action.payload);
+        console.log("Login fulfilled with payload:", JSON.stringify(action.payload, null, 2)); 
         state.isAuthenticated = true;
         state.token = action.payload.token;
-        state.userData = { ...action.payload, token: undefined }; 
-        state.email = action.payload.email;
+        state.userData = { 
+          id: action.payload.userData.id,
+          email: action.payload.email,
+          firstName: action.payload.userData.firstName,
+          lastName: action.payload.userData.lastName,
+          userName: action.payload.userData.userName,
+        };
         state.loading = false;
       })
       .addCase(loginUser.rejected, (state, action) => {
+        console.log("Login rejected with payload:", JSON.stringify(action.payload, null, 2));
         state.loading = false;
-        state.error = action.error.message;
+        state.error = action.payload; 
       })
 
       .addCase(updateUser.pending, (state) => {
+        console.log("UpdateUser pending");
         state.loading = true;
+        state.error = null;
       })
       .addCase(updateUser.fulfilled, (state, action) => {
-        state.userData = { ...state.userData, userName: action.payload.userName, };
+        console.log("UpdateUser fulfilled with payload:", JSON.stringify(action.payload, null, 2));
+        if (action.payload && action.payload.userName) {
+          state.userData.userName = action.payload.userName;
+          console.log("userData mis à jour:", JSON.stringify(state.userData, null, 2));
+        } else {
+          console.warn("Action payload ne contient pas userName:", JSON.stringify(action.payload, null, 2));
+        }
         state.loading = false;
       })
       .addCase(updateUser.rejected, (state, action) => {
+        console.log("UpdateUser rejected with payload:", JSON.stringify(action.payload, null, 2)); 
         state.loading = false;
-        state.error = action.error.message;
+        state.error = action.payload;  
       });
   },
 });
