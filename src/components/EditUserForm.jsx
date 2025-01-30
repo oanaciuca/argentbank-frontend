@@ -1,19 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { updateUser } from '../redux/authSlice'; 
 
-const EditUserForm = ({ onSave, onCancel, loading }) => {
-  const userData = useSelector((state) => state.auth.userData);
-  const dispatch = useDispatch();
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (!userData) {
-    return <div>No user data available</div>;
-  }
-
+const EditUserForm = ({ userData, onSave, onCancel, loading }) => {
   const [newUserData, setNewUserData] = useState({
     userName: userData.userName || '',
     firstName: userData.firstName || '',
@@ -22,20 +9,27 @@ const EditUserForm = ({ onSave, onCancel, loading }) => {
 
   useEffect(() => {
     if (userData) { 
-    setNewUserData({
-      userName: userData.userName || '',
-      firstName: userData.firstName || '',
-      lastName: userData.lastName || '',
-    });
-  }
+      console.log("EditUserForm - useEffect - userData:", userData);
+      setNewUserData({
+        userName: userData.userName || '',
+        firstName: userData.firstName || '',
+        lastName: userData.lastName || '',
+      });
+    }
   }, [userData]); 
 
-  
   const handleSaveClick = () => {
-    dispatch(updateUser({ newUserName: newUserData.userName })); 
-    onSave(newUserData); 
-  };
+    console.log("EditUserForm - newUserData avant envoi :", newUserData);
+    console.log('EditUserForm - Type de newUserData.userName :', typeof newUserData.userName);
+    
+    if (typeof newUserData.userName === 'string' && newUserData.userName.trim() !== '') {
+      console.log("EditUserForm - newUserData.userName :", newUserData.userName);
 
+      onSave({ userName: newUserData.userName });
+    } else {
+      console.error("EditUserForm - Le nom d'utilisateur doit être une chaîne de caractères non vide.");
+    }
+  };
 
   return (
     <div className="edit-container">
@@ -57,7 +51,7 @@ const EditUserForm = ({ onSave, onCancel, loading }) => {
           <input
             type="text"
             id="firstName"
-            value={userData.firstName}
+            value={newUserData.firstName}
             readOnly 
           />
         </div>
@@ -66,7 +60,7 @@ const EditUserForm = ({ onSave, onCancel, loading }) => {
           <input
             type="text"
             id="lastName"
-            value={userData.lastName}
+            value={newUserData.lastName}
             readOnly 
           />
         </div>
