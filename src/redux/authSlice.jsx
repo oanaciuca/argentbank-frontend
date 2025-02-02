@@ -43,7 +43,7 @@ export const updateUser = createAsyncThunk(
     try {
       await updateUserProfile(newUserName);
       console.log("Réponse de updateUserProfile: Mise à jour réussie");
-
+      localStorage.setItem('userName', newUserName);
       return { userName: newUserName };
     } catch (error) {
       console.error("Erreur dans updateUser thunk:", error);
@@ -85,7 +85,7 @@ const authSlice = createSlice({
           email: action.payload.email,
           firstName: action.payload.userData.firstName,
           lastName: action.payload.userData.lastName,
-          userName: action.payload.userData.userName,
+          userName: localStorage.getItem('userName') || action.payload.userData.userName,
         };
         state.loading = false;
       })
