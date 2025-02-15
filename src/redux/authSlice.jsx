@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { login } from '../api/authApi';  
-import { updateUserProfile } from '../api/userApi';  
+import { getUserProfile } from '../api/getUserProfile'; 
+import { updateUserProfile } from '../api/userApi';
 
 const initialState = {
   isAuthenticated: false,
@@ -20,10 +21,16 @@ export const loginUser = createAsyncThunk(
   'auth/login',
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      const response = await login(email, password); 
-      console.log("Login response:", JSON.stringify(response, null, 2)); 
-
-      return response;  
+      // Appel à l'API POST pour obtenir le token
+      const loginResponse = await login(email, password); 
+      console.log("Login response:", JSON.stringify(loginResponse, null, 2)); 
+      
+      // Appel à l'API GET pour récupérer le profil utilisateur complet
+      const profileResponse = await getUserProfile();
+      console.log("Profile response:", JSON.stringify(profileResponse, null, 2));
+      
+      // On retourne le token et les données utilisateur complètes (situées dans "body")
+      return { token: loginResponse.token, userData: profileResponse };
     } catch (error) {
       console.error("Erreur dans loginUser:", error); 
       return rejectWithValue(error.message);  
@@ -43,8 +50,13 @@ export const updateUser = createAsyncThunk(
     try {
       await updateUserProfile(newUserName);
       console.log("Réponse de updateUserProfile: Mise à jour réussie");
-      localStorage.setItem('userName', newUserName);
-      return { userName: newUserName };
+      
+      // Appel à l'API GET pour récupérer le profil mis à jour
+      const profileResponse = await getUserProfile();
+      console.log("Profile response après update:", JSON.stringify(profileResponse, null, 2));
+      
+      // Retourne le nouveau userName extrait de la propriété "body"
+      return { userName: profileResponse.body.userName };
     } catch (error) {
       console.error("Erreur dans updateUser thunk:", error);
       return rejectWithValue(error.message);  
@@ -66,26 +78,28 @@ const authSlice = createSlice({
         lastName: '',
         userName: '',
       };
-      state.email = null;
+      state.error = null;
       localStorage.removeItem('token');  
     },
   },
   extraReducers: (builder) => {
+    // Gestion du login
     builder
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
-        console.log("Login fulfilled with payload:", JSON.stringify(action.payload, null, 2)); 
+        console.log("Login fulfilled with payload:", JSON.stringify(action.payload, null, 2));
         state.isAuthenticated = true;
         state.token = action.payload.token;
+        // On extrait les données utilisateur depuis "body"
         state.userData = { 
-          id: action.payload.userData.id,
-          email: action.payload.email,
-          firstName: action.payload.userData.firstName,
-          lastName: action.payload.userData.lastName,
-          userName: localStorage.getItem('userName') || action.payload.userData.userName,
+          id: action.payload.userData.body.id,
+          email: action.payload.userData.body.email,
+          firstName: action.payload.userData.body.firstName,
+          lastName: action.payload.userData.body.lastName,
+          userName: action.payload.userData.body.userName,
         };
         state.loading = false;
       })
@@ -95,6 +109,7 @@ const authSlice = createSlice({
         state.error = action.payload; 
       })
 
+      // Gestion de la mise à jour du username
       .addCase(updateUser.pending, (state) => {
         console.log("UpdateUser pending");
         state.loading = true;
@@ -119,5 +134,4 @@ const authSlice = createSlice({
 });
 
 export const { logout } = authSlice.actions;
-
 export default authSlice.reducer;
