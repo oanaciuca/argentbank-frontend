@@ -1,5 +1,3 @@
-import usersData from '../data/usersData';
-
 export const login = async (email, password) => {
   const response = await fetch('http://localhost:3001/api/v1/user/login', {
     method: 'POST',
@@ -16,11 +14,6 @@ export const login = async (email, password) => {
   const data = await response.json();
   console.log('login response:', data);
 
-  const user = usersData.find((u) => u.email === email);
-  if (!user) {
-    throw new Error('Utilisateur introuvable');
-  }
-
   if (!data.body || !data.body.token) {
     throw new Error('Token manquant dans la réponse');
   }
@@ -29,16 +22,8 @@ export const login = async (email, password) => {
   localStorage.setItem('token', `Bearer ${token}`);
   console.log("Token stocké dans localStorage:", localStorage.getItem('token'));
 
-  return {
-    token,
-    userData: {
-      id: user.id, 
-      firstName: user.firstName,
-      lastName: user.lastName,
-      userName: user.userName,
-    },
-    email,
-  };
+  // On ne retourne que le token ici
+  return { token };
 };
 
 export const logout = () => {
