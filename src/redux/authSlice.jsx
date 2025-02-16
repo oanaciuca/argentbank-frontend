@@ -22,17 +22,14 @@ export const loginUser = createAsyncThunk(
   async ({ email, password }, { rejectWithValue }) => {
     try {
       // Appel à l'API POST pour obtenir le token
-      const loginResponse = await login(email, password); 
-      console.log("Login response:", JSON.stringify(loginResponse, null, 2)); 
+      const loginResponse = await login(email, password);  
       
       // Appel à l'API GET pour récupérer le profil utilisateur complet
       const profileResponse = await getUserProfile();
-      console.log("Profile response:", JSON.stringify(profileResponse, null, 2));
       
-      // On retourne le token et les données utilisateur complètes (situées dans "body")
+      // On retourne le token et les données utilisateur complètes 
       return { token: loginResponse.token, userData: profileResponse };
     } catch (error) {
-      console.error("Erreur dans loginUser:", error); 
       return rejectWithValue(error.message);  
     }
   }
@@ -41,19 +38,16 @@ export const loginUser = createAsyncThunk(
 export const updateUser = createAsyncThunk(
   'auth/updateUser',
   async ({ newUserName }, { rejectWithValue }) => {
-    const token = localStorage.getItem('token');  
-    console.log("Token dans updateUser : ", token);  
+    const token = localStorage.getItem('token');    
     if (!token) {
       return rejectWithValue('Token absent');
     }
 
     try {
       await updateUserProfile(newUserName);
-      console.log("Réponse de updateUserProfile: Mise à jour réussie");
       
       // Appel à l'API GET pour récupérer le profil mis à jour
       const profileResponse = await getUserProfile();
-      console.log("Profile response après update:", JSON.stringify(profileResponse, null, 2));
       
       // Retourne le nouveau userName extrait de la propriété "body"
       return { userName: profileResponse.body.userName };
@@ -90,7 +84,6 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
-        console.log("Login fulfilled with payload:", JSON.stringify(action.payload, null, 2));
         state.isAuthenticated = true;
         state.token = action.payload.token;
         // On extrait les données utilisateur depuis "body"
@@ -104,7 +97,6 @@ const authSlice = createSlice({
         state.loading = false;
       })
       .addCase(loginUser.rejected, (state, action) => {
-        console.log("Login rejected with payload:", JSON.stringify(action.payload, null, 2));
         state.loading = false;
         state.error = action.payload; 
       })
@@ -116,17 +108,13 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(updateUser.fulfilled, (state, action) => {
-        console.log("UpdateUser fulfilled with payload:", JSON.stringify(action.payload, null, 2));
         if (action.payload && action.payload.userName) {
           state.userData.userName = action.payload.userName;
-          console.log("userData mis à jour:", JSON.stringify(state.userData, null, 2));
-        } else {
-          console.warn("Action payload ne contient pas userName:", JSON.stringify(action.payload, null, 2));
         }
         state.loading = false;
       })
-      .addCase(updateUser.rejected, (state, action) => {
-        console.log("UpdateUser rejected with payload:", JSON.stringify(action.payload, null, 2)); 
+        
+      .addCase(updateUser.rejected, (state, action) => { 
         state.loading = false;
         state.error = action.payload;  
       });

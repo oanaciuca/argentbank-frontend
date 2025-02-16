@@ -1,8 +1,5 @@
 export const updateUserProfile = async (newUsername) => {
     const token = localStorage.getItem('token');  
-    
-    console.log("Token récupéré depuis localStorage : ", token); 
-
     if (!token) {
       throw new Error("Token absent");
     }
@@ -14,8 +11,6 @@ export const updateUserProfile = async (newUsername) => {
     if (typeof newUsername !== 'string') {
       throw new Error("Le nom d'utilisateur doit être une chaîne de caractères");
     }
-
-    console.log("newUsername dans updateUserProfile :", newUsername);
 
     try {
       const response = await fetch('http://localhost:3001/api/v1/user/profile', {
@@ -32,11 +27,9 @@ export const updateUserProfile = async (newUsername) => {
         throw new Error(`Erreur serveur: ${errorText}`);
       }
 
-      const data = await response.json();
-      console.log("Réponse de l'API après mise à jour:", JSON.stringify(data, null, 2)); 
+      const data = await response.json(); 
       return data;  
     } catch (error) {
-      console.error('Erreur lors de la requête PUT:', error);
       throw error;  
     }
 };

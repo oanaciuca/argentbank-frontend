@@ -9,7 +9,6 @@ const EditUserForm = ({ userData, onSave, onCancel, loading }) => {
 
   useEffect(() => {
     if (userData) { 
-      console.log("EditUserForm - useEffect - userData:", userData);
       setNewUserData({
         userName: userData.userName || '',
         firstName: userData.firstName || '',
@@ -19,8 +18,6 @@ const EditUserForm = ({ userData, onSave, onCancel, loading }) => {
   }, [userData]); 
 
   const handleSaveClick = () => {
-    console.log("EditUserForm - newUserData avant envoi :", newUserData);
-    console.log('EditUserForm - Type de newUserData.userName :', typeof newUserData.userName);
     
     if (typeof newUserData.userName === 'string' && newUserData.userName.trim() !== '') {
       console.log("EditUserForm - newUserData.userName :", newUserData.userName);
