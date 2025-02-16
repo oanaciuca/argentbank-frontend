@@ -12,7 +12,6 @@ export const login = async (email, password) => {
   }
 
   const data = await response.json();
-  console.log('login response:', data);
 
   if (!data.body || !data.body.token) {
     throw new Error('Token manquant dans la réponse');
@@ -20,9 +19,7 @@ export const login = async (email, password) => {
 
   const token = data.body.token;
   localStorage.setItem('token', `Bearer ${token}`);
-  console.log("Token stocké dans localStorage:", localStorage.getItem('token'));
-
-  // On ne retourne que le token ici
+  
   return { token };
 };
 
